@@ -16,19 +16,15 @@ app.add_middleware(
 
 @app.post("/api/heart-data")
 async def receive_bpm(request: Request):
-    try:
-        data = await request.json()
-        bpm = data.get("bpm")
-        if bpm is None:
-            raise HTTPException(status_code=400, detail="Missing 'bpm' in request")
-
+    data = await request.json()
+    bpm = data.get("bpm")
+    if bpm:
         latest_bpm["value"] = bpm
-        print(f"✅ Received BPM: {bpm}")
+        print(f"Received BPM: {bpm}")
         return {"status": "ok", "received": bpm}
+    else:
+        return {"status": "error", "message": "Missing bpm"}
 
-    except Exception as e:
-        print(f"❌ Error receiving BPM: {e}")
-        raise HTTPException(status_code=500, detail="Invalid data format")
 
 @app.get("/latest-bpm")
 def get_latest_bpm():
